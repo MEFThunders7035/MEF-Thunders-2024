@@ -5,18 +5,14 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.commands.BasicIntakeCommand;
 import frc.robot.commands.DriveCommands;
@@ -31,17 +27,15 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSystem;
-import frc.robot.subsystems.LogitechController;
 import frc.robot.subsystems.PhotonCameraSystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import org.littletonrobotics.urcl.URCL;
 
 public class RobotContainer {
-  private final XboxController controller = new LogitechController(0);
+  private final CommandXboxController commandController = new CommandXboxController(0);
+  private final XboxController controller = commandController.getHID();
 
   private final SendableChooser<Command> autoChooser;
-
-  private final GenericHID midiController = new GenericHID(1);
 
   private final DriveSubsystem driveSubsystem = new DriveSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -127,70 +121,43 @@ public class RobotContainer {
   }
 
   private void configureJoystickBindings() {
-    new JoystickButton(controller, Button.kA.value) // Handbrake
-        .whileTrue(new RunCommand(driveSubsystem::setX, driveSubsystem));
+    commandController.a().whileTrue(new RunCommand(driveSubsystem::setX, driveSubsystem));
 
-    new JoystickButton(controller, Button.kB.value) // Intake
-        .whileTrue(new SmartIntakeCommand(intakeSubsystem, controller));
+    commandController.b().whileTrue(new SmartIntakeCommand(intakeSubsystem, controller));
 
-    new JoystickButton(controller, Button.kY.value) // Shoot, smart (Fully Shoot)
+    commandController
+        .y()
         .whileTrue(
             new ShootToSpeakerCommand(
                 shooterSubsystem, intakeSubsystem, armSubsystem, driveSubsystem, controller));
 
-    new JoystickButton(controller, Button.kX.value)
+    commandController
+        .x()
         .whileTrue(new ShootToAmpCommand(shooterSubsystem, intakeSubsystem, armSubsystem));
 
-    new JoystickButton(controller, Button.kStart.value) // Reset Heading
-        .onTrue(
-            driveSubsystem
-                .runOnce(driveSubsystem::zeroFieldOrientation)
-                .alongWith(new PrintCommand("Zeroing Field Orientation"))
-                .ignoringDisable(true));
+    commandController.start().onTrue(driveSubsystem.resetFieldOrientation());
 
     // This command is here incase the intake gets stuck.
-    new JoystickButton(controller, Button.kBack.value) // Force push note out of intake
+    commandController.back().whileTrue(intakeSubsystem.run(-IntakeConstants.kIntakeSpeed));
+
+    commandController.rightBumper().whileTrue(shooterSubsystem.run(-1));
+
+    // lower level shoot command incase the other one has some issues it will not rotate the robot
+    // to face the shooter. which can sometimes break, currently investigating.
+    commandController
+        .leftBumper()
         .whileTrue(
-            new RunCommand(
-                () -> intakeSubsystem.setIntakeSpeed(-IntakeConstants.kIntakeSpeed),
-                intakeSubsystem));
+            new ShootToSpeakerCommand(
+                shooterSubsystem, intakeSubsystem, armSubsystem, driveSubsystem));
 
-    new JoystickButton(controller, Button.kRightBumper.value) // Reverse Shooter to intake
-        .whileTrue(new RunCommand(() -> shooterSubsystem.setShooterSpeed(-1), shooterSubsystem));
-
-    new JoystickButton(controller, Button.kLeftBumper.value)
-        .whileTrue(new ShootToSpeakerCommand(shooterSubsystem, intakeSubsystem));
-
-    new Trigger(() -> controller.getPOV() == 0)
-        // Move arm to 0.5, and set it there until the button is released.
-        .whileTrue(armSubsystem.run(() -> armSubsystem.setArmToPosition(0.5)));
-
-    configureMidiBindings();
-  }
-
-  private void configureMidiBindings() {
-    // This is incase load to shooter command fails.
-    new JoystickButton(midiController, 1) // Force Push intake on midi
-        .whileTrue(intakeSubsystem.run(() -> intakeSubsystem.setIntakeSpeed(1, true)));
-
-    new JoystickButton(midiController, 2)
-        .onTrue(armSubsystem.runOnce(armSubsystem::resetEncoder).ignoringDisable(true));
-
-    new JoystickButton(midiController, 3)
-        .whileTrue(new ShootToSpeakerCommand(shooterSubsystem, intakeSubsystem));
-
-    new JoystickButton(midiController, 4)
-        .whileTrue(new ShootToSpeakerCommand(shooterSubsystem, intakeSubsystem));
-
-    new JoystickButton(midiController, 16)
-        .onTrue(
-            driveSubsystem.runOnce(driveSubsystem::toggleForceRobotOriented).ignoringDisable(true));
+    commandController.pov(0).whileTrue(armSubsystem.setArmToAmp());
+    commandController.pov(180).whileTrue(armSubsystem.setArmToBottom());
   }
 
   public Command getAutonomousCommand() {
     return autoChooser
         .getSelected()
-        .andThen(() -> driveSubsystem.drive(0, 0, 0))
+        .andThen(driveSubsystem.stop())
         .beforeStarting(armSubsystem.runOnce(armSubsystem::resetEncoder));
   }
 }

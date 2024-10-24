@@ -14,7 +14,7 @@ public class DriveCommands {
     return driveSubsystem.drive(
         () ->
             addBoost(
-                controller.getLeftY(), // TODO: invert this
+                -controller.getLeftY(),
                 getBoostByValue(
                     controller)), // this is inverted because logitech controller is inverted
         () ->
@@ -34,7 +34,7 @@ public class DriveCommands {
     return driveSubsystem.drive(
         () ->
             addBoost(
-                controller.getLeftY(), // TODO: invert this
+                -controller.getLeftY(),
                 getBoostByValue(
                     controller)), // this is inverted because logitech controller is inverted
         () ->

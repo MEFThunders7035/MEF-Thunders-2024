@@ -22,6 +22,10 @@ public class ShooterSubsystem extends SubsystemBase implements AutoCloseable {
     return runShooter(ShooterConstants.kShooterSpeed);
   }
 
+  public Command run(double speed) {
+    return runShooter(speed);
+  }
+
   public Command stop() {
     return this.runOnce(this::stopShooter);
   }
@@ -34,18 +38,11 @@ public class ShooterSubsystem extends SubsystemBase implements AutoCloseable {
     return runShooter(() -> speed);
   }
 
-  /**
-   * @deprecated Will turn private in the future as we switch to fully command based style
-   *     subsystems. Use {@link #runShooter(DoubleSupplier)} or {@link #runShooter(double)} instead.
-   * @param speed
-   */
-  @Deprecated
-  public void setShooterSpeed(double speed) {
+  private void setShooterSpeed(double speed) {
     shooterMotor.setVoltage(speed * 12.0);
   }
 
-  @Deprecated
-  public void stopShooter() {
+  private void stopShooter() {
     shooterMotor.stopMotor();
   }
 }

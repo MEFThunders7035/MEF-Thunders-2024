@@ -4,14 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import command_tests.utils.CommandTestBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.MoveArmToAmp;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class MoveArmToAmpTest extends CommandTestBase {
-  private MoveArmToAmp moveArmToAmpCommand;
+  private Command moveArmToAmpCommand;
   private ArmSubsystem armSubsystem;
 
   @BeforeEach
@@ -19,7 +19,7 @@ class MoveArmToAmpTest extends CommandTestBase {
     super.setUp();
 
     armSubsystem = new ArmSubsystem();
-    moveArmToAmpCommand = new MoveArmToAmp(armSubsystem);
+    moveArmToAmpCommand = armSubsystem.setArmToAmp();
     commandScheduler.schedule(moveArmToAmpCommand);
   }
 

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import command_tests.utils.CommandTestBase;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
-import frc.robot.commands.LoadToShooterCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.utils.sim_utils.ColorSensorV3Wrapped;
 import org.junit.jupiter.api.AfterEach;
@@ -14,14 +14,14 @@ import org.junit.jupiter.api.Test;
 
 class LoadToShooterTest extends CommandTestBase {
   IntakeSubsystem intakeSubsystem;
-  LoadToShooterCommand command;
+  Command command;
 
   @BeforeEach
   public void setUp() {
     super.setUp();
 
     intakeSubsystem = new IntakeSubsystem();
-    command = new LoadToShooterCommand(intakeSubsystem);
+    command = intakeSubsystem.loadToShooter();
 
     commandScheduler.schedule(command);
   }

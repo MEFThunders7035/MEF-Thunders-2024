@@ -10,9 +10,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.DriveSubsystem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ class DefaultDriveCommandTest extends CommandTestBase {
   DriveSubsystem driveSubsystem;
   XboxController controller;
   XboxControllerSim controllerSim;
-  DefaultDriveCommand defaultDriveCommand;
+  Command defaultDriveCommand;
 
   @BeforeEach
   public void setUp() {
@@ -31,7 +32,7 @@ class DefaultDriveCommandTest extends CommandTestBase {
     driveSubsystem = new DriveSubsystem();
     controller = new XboxController(0);
     controllerSim = new XboxControllerSim(controller);
-    defaultDriveCommand = new DefaultDriveCommand(driveSubsystem, controller);
+    defaultDriveCommand = DriveCommands.driveWithController(driveSubsystem, controller);
     commandScheduler.schedule(defaultDriveCommand);
   }
 

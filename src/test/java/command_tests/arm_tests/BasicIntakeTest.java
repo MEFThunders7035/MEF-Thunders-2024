@@ -7,7 +7,7 @@ import static subsystem_tests.led_tests.utils.LEDTestUtils.checkForColorInAll;
 import command_tests.utils.CommandTestBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.commands.BasicIntakeCommand;
+import frc.robot.commands.IntakeWithLEDCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.utils.sim_utils.ColorSensorV3Wrapped;
 import org.junit.jupiter.api.AfterEach;
@@ -17,13 +17,13 @@ import org.junit.jupiter.api.Test;
 class BasicIntakeTest extends CommandTestBase {
   private IntakeSubsystem intakeSubsystem;
 
-  private BasicIntakeCommand intakeCommand;
+  private IntakeWithLEDCommand intakeCommand;
 
   @BeforeEach
   public void setUp() {
     super.setUp();
     intakeSubsystem = new IntakeSubsystem();
-    intakeCommand = new BasicIntakeCommand(intakeSubsystem);
+    intakeCommand = new IntakeWithLEDCommand(intakeSubsystem);
 
     commandScheduler.schedule(intakeCommand);
   }

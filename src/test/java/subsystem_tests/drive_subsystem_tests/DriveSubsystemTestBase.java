@@ -1,33 +1,24 @@
 package subsystem_tests.drive_subsystem_tests;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import subsystem_tests.SubsystemTestBase;
 
-public class DriveSubsystemTestBase {
+public class DriveSubsystemTestBase extends SubsystemTestBase {
   protected DriveSubsystem driveSubsystem;
-  protected CommandScheduler commandScheduler;
 
   @BeforeEach
+  @Override
   public void setUp() {
-    assert HAL.initialize(500, 0);
-    commandScheduler = CommandScheduler.getInstance();
+    super.setUp();
     driveSubsystem = new DriveSubsystem();
-
-    // Enable robot for commands to run
-    DriverStationSim.setEnabled(true);
-    DriverStationSim.setDsAttached(true);
-    DriverStationSim.notifyNewData(); // ! Breaks without this
   }
 
   @AfterEach
+  @Override
   public void tearDown() {
-    commandScheduler.cancelAll();
-    commandScheduler.unregisterAllSubsystems(); // ! breaks all test tests if not done
+    super.tearDown();
     driveSubsystem.close();
-    commandScheduler.close();
   }
 }

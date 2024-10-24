@@ -20,6 +20,7 @@ class BasicIntakeTest extends CommandTestBase {
   private IntakeWithLEDCommand intakeCommand;
 
   @BeforeEach
+  @Override
   public void setUp() {
     super.setUp();
     intakeSubsystem = new IntakeSubsystem();
@@ -29,6 +30,7 @@ class BasicIntakeTest extends CommandTestBase {
   }
 
   @AfterEach
+  @Override
   public void tearDown() {
     super.tearDown();
     intakeSubsystem.close();

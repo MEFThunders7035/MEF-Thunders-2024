@@ -2,31 +2,35 @@ package subsystem_tests.arm_tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.utils.sim_utils.ColorSensorV3Wrapped;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import subsystem_tests.SubsystemTestBase;
 
-class IntakeTests {
+class IntakeTests extends SubsystemTestBase {
   private IntakeSubsystem intakeSubsystem;
 
   @BeforeEach
+  @Override
   public void setUp() {
-    HAL.initialize(500, 0);
+    super.setUp();
     intakeSubsystem = new IntakeSubsystem();
   }
 
   @AfterEach
+  @Override
   public void tearDown() {
+    super.tearDown();
     intakeSubsystem.close();
   }
 
   @Test
   void testIntakeSubsystem() {
-    intakeSubsystem.setIntakeSpeed(0.5);
+    runCommand(intakeSubsystem.run(0.5));
+
     assertEquals(0.5, intakeSubsystem.getArmIntakeSpeed(), 0.001);
   }
 
@@ -42,14 +46,14 @@ class IntakeTests {
   @Test
   void testIntakeStopsOnNote() {
     ColorSensorV3Wrapped.setNoteColor(false);
-    intakeSubsystem.setIntakeSpeed(0.5);
+    runCommand(intakeSubsystem.run(0.5));
     assertEquals(
         0.5,
         intakeSubsystem.getArmIntakeSpeed(),
         0.001,
         "Intake motor should be running when a note is not detected");
     ColorSensorV3Wrapped.setNoteColor(true);
-    Timer.delay(0.1); // wait until note is detected
+    commandScheduler.run();
     assertEquals(
         0,
         intakeSubsystem.getArmIntakeSpeed(),
@@ -60,15 +64,20 @@ class IntakeTests {
   @Test
   void testIntakeForcePushes() {
     ColorSensorV3Wrapped.setNoteColor(true);
-    intakeSubsystem.setIntakeSpeed(0.5, 0, true); // force push note out
+    runCommand(intakeSubsystem.loadToShooter()); // force push note out
     assertEquals(
-        0.5,
+        IntakeConstants.kArmIntakeRunSpeed,
         intakeSubsystem.getArmIntakeSpeed(),
         0.001,
-        "Intake Motor Should Run when force pushed");
-    Timer.delay(0.15); // if broken, increase this
+        "Arm Intake Motor should run when loading to shooter");
     assertEquals(
-        0.5,
+        0,
+        intakeSubsystem.getGroundIntakeSpeed(),
+        0.001,
+        "Ground Intake Motor shouldn't run when loading to shooter");
+    commandScheduler.run();
+    assertEquals(
+        IntakeConstants.kArmIntakeRunSpeed,
         intakeSubsystem.getArmIntakeSpeed(),
         0.001,
         "Intake motor should continue to run when forced");
@@ -77,7 +86,7 @@ class IntakeTests {
   @Test
   void testIntakeSubsystemWithNote() {
     ColorSensorV3Wrapped.setNoteColor(true);
-    intakeSubsystem.setIntakeSpeed(0.5);
+    runCommand(intakeSubsystem.run(0.5));
     assertEquals(
         0,
         intakeSubsystem.getArmIntakeSpeed(),

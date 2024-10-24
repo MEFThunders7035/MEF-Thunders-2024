@@ -119,7 +119,8 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
             // here
             ),
         () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
@@ -211,8 +212,10 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     var poseOpt = PhotonCameraSystem.getEstimatedGlobalPose(field.getRobotPose());
     SmartDashboard.putBoolean("AprilTag Seen", poseOpt.isPresent());
     if (poseOpt.isPresent() && poseOpt.get().targetsUsed.size() > 1) {
-      // Do not use the rotation from the vision system in any situation as the data we receive is
-      // not reliable. navX rotation is A LOT MORE reliable so we will use that instead.
+      // Do not use the rotation from the vision system in any situation as the data
+      // we receive is
+      // not reliable. navX rotation is A LOT MORE reliable so we will use that
+      // instead.
       Pose2d receivedPose = poseOpt.get().estimatedPose.toPose2d();
       Pose2d poseToUse = new Pose2d(receivedPose.getTranslation(), getRotation2d());
       swerveOdometry.addVisionMeasurement(poseToUse, poseOpt.get().timestampSeconds);
@@ -326,8 +329,8 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /** Sets the wheels into an X formation to prevent movement. */
-  public void setX() {
-    this.runOnce(this::setModulesToXFormation);
+  public Command setX() {
+    return this.runOnce(this::setModulesToXFormation);
   }
 
   /**
@@ -369,6 +372,15 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
     return drive(xSpeed, ySpeed, rot, true, true);
   }
 
+  public Command drive(
+      double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
+    return drive(() -> xSpeed, () -> ySpeed, () -> rot, fieldRelative, rateLimit);
+  }
+
+  public Command drive(double xSpeed, double ySpeed, double rot) {
+    return drive(xSpeed, ySpeed, rot, true, true);
+  }
+
   public Command stop() {
     return this.runOnce(this::stop);
   }
@@ -406,7 +418,8 @@ public class DriveSubsystem extends SubsystemBase implements AutoCloseable {
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
       double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
 
-      // Calculate the direction slew rate based on an estimate of the lateral acceleration
+      // Calculate the direction slew rate based on an estimate of the lateral
+      // acceleration
       double directionSlewRate;
       if (currentTranslationMag != 0.0) {
         directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / currentTranslationMag);

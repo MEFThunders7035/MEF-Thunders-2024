@@ -7,7 +7,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class SmartIntakeCommand extends ParallelCommandGroup {
   public SmartIntakeCommand(IntakeSubsystem intakeSubsystem, XboxController controller) {
     super(
-        new BasicIntakeCommand(intakeSubsystem),
+        new IntakeWithLEDCommand(intakeSubsystem),
         intakeSubsystem.vibrateControllerOnNoteCommand(controller));
   }
 }

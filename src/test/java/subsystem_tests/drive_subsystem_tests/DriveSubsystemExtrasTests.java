@@ -8,18 +8,20 @@ import org.junit.jupiter.api.Test;
 
 class DriveSubsystemExtrasTests extends DriveSubsystemTestBase {
   @BeforeEach
+  @Override
   public void setUp() {
     super.setUp();
   }
 
   @AfterEach
+  @Override
   public void tearDown() {
     super.tearDown();
   }
 
   @Test
   void testSetX() {
-    driveSubsystem.setX();
+    runCommand(driveSubsystem.setX());
     var states = driveSubsystem.getModuleDesiredStates();
     int[] expectedAngles = {45, -45, -45, 45};
 

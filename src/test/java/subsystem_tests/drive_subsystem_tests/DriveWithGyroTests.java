@@ -13,11 +13,13 @@ import subsystem_tests.drive_subsystem_tests.utils.NavXSim;
 class DriveWithGyroTests extends DriveSubsystemTestBase {
 
   @BeforeEach
+  @Override
   public void setUp() {
     super.setUp();
   }
 
   @AfterEach
+  @Override
   public void tearDown() {
     super.tearDown();
   }
@@ -28,7 +30,7 @@ class DriveWithGyroTests extends DriveSubsystemTestBase {
     NavXSim.setConnected(true);
     NavXSim.setAngle(90);
     Timer.delay(0.1); // wait 20ms for the navX Thread to update
-    driveSubsystem.drive(0.5, 0, 0, true, false);
+    runCommand(driveSubsystem.drive(0.5, 0, 0, true, false));
 
     for (var state : driveSubsystem.getModuleDesiredStates()) {
       assertEquals(DriveConstants.kMaxSpeedMetersPerSecond * 0.5, state.speedMetersPerSecond, 0.01);
@@ -42,7 +44,7 @@ class DriveWithGyroTests extends DriveSubsystemTestBase {
     NavXSim.setConnected(true);
     NavXSim.setAngle(45);
     Timer.delay(0.1); // wait 20ms for the navX Thread to update
-    driveSubsystem.drive(0, 0.5, 0, true, false);
+    runCommand(driveSubsystem.drive(0, 0.5, 0, true, false));
 
     for (var state : driveSubsystem.getModuleDesiredStates()) {
       assertEquals(DriveConstants.kMaxSpeedMetersPerSecond * 0.5, state.speedMetersPerSecond, 0.01);

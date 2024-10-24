@@ -5,8 +5,8 @@ import frc.robot.commands.led_commands.LEDBlinkRedCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSystem;
 
-public class BasicIntakeCommand extends ParallelRaceGroup {
-  public BasicIntakeCommand(IntakeSubsystem intakeSubsystem) {
+public class IntakeWithLEDCommand extends ParallelRaceGroup {
+  public IntakeWithLEDCommand(IntakeSubsystem intakeSubsystem) {
     super(intakeSubsystem.run(), new LEDBlinkRedCommand(LEDSystem.getInstance()));
   }
 }

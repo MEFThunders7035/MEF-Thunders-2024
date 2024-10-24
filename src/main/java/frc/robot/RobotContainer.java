@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.commands.BasicIntakeCommand;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.IntakeWithLEDCommand;
 import frc.robot.commands.ShootToAmpCommand;
 import frc.robot.commands.ShootToSpeakerCommand;
 import frc.robot.commands.SmartIntakeCommand;
@@ -98,7 +98,7 @@ public class RobotContainer {
   }
 
   private void setupNamedCommands() {
-    NamedCommands.registerCommand("Intake", new BasicIntakeCommand(intakeSubsystem));
+    NamedCommands.registerCommand("Intake", new IntakeWithLEDCommand(intakeSubsystem));
     NamedCommands.registerCommand(
         "Shoot To Speaker",
         new ShootToSpeakerCommand(shooterSubsystem, intakeSubsystem, armSubsystem, driveSubsystem));
@@ -142,7 +142,8 @@ public class RobotContainer {
 
     commandController.rightBumper().whileTrue(shooterSubsystem.run(-1));
 
-    // lower level shoot command incase the other one has some issues it will not rotate the robot
+    // lower level shoot command incase the other one has some issues it will not
+    // rotate the robot
     // to face the shooter. which can sometimes break, currently investigating.
     commandController
         .leftBumper()

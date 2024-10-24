@@ -12,18 +12,20 @@ import subsystem_tests.drive_subsystem_tests.utils.DriveTestUtils;
 
 class DriveTests extends DriveSubsystemTestBase {
   @BeforeEach
+  @Override
   public void setUp() {
     super.setUp();
   }
 
   @AfterEach
+  @Override
   public void tearDown() {
     super.tearDown();
   }
 
   @Test
   void testRotation() {
-    driveSubsystem.drive(0, 0, 0.5, false, false);
+    runCommand(driveSubsystem.drive(0, 0, 0.5, false, false));
 
     var shouldBe = DriveTestUtils.driveToChassisSpeeds(0, 0, 0.5);
     var currentlyIs = DriveTestUtils.getDesiredChassisSpeeds(driveSubsystem);
@@ -43,7 +45,7 @@ class DriveTests extends DriveSubsystemTestBase {
 
   @Test
   void testDriveForwardRobotRelative() {
-    driveSubsystem.drive(0.5, 0, 0, false, false);
+    runCommand(driveSubsystem.drive(0.5, 0, 0, false, false));
 
     var shouldBe = DriveTestUtils.driveToChassisSpeeds(0.5, 0, 0);
     var currentlyIs = DriveTestUtils.getDesiredChassisSpeeds(driveSubsystem);
@@ -53,7 +55,7 @@ class DriveTests extends DriveSubsystemTestBase {
 
   @Test
   void testDriveSidewaysRobotRelative() {
-    driveSubsystem.drive(0, 0.5, 0, false, false);
+    runCommand(driveSubsystem.drive(0, 0.5, 0, false, false));
 
     var shouldBe = DriveTestUtils.driveToChassisSpeeds(0, 0.5, 0);
     var currentlyIs = DriveTestUtils.getDesiredChassisSpeeds(driveSubsystem);
@@ -63,7 +65,7 @@ class DriveTests extends DriveSubsystemTestBase {
 
   @Test
   void testDriveForwardFieldRelative() {
-    driveSubsystem.drive(0.5, 0, 0, true, false);
+    runCommand(driveSubsystem.drive(0.5, 0, 0, true, false));
 
     for (var state : driveSubsystem.getModuleDesiredStates()) {
       assertEquals(DriveConstants.kMaxSpeedMetersPerSecond * 0.5, state.speedMetersPerSecond, 0.01);
@@ -73,7 +75,7 @@ class DriveTests extends DriveSubsystemTestBase {
 
   @Test
   void testDriveSidewaysFieldRelative() {
-    driveSubsystem.drive(0, 0.5, 0, true, false);
+    runCommand(driveSubsystem.drive(0, 0.5, 0, true, false));
 
     for (var state : driveSubsystem.getModuleDesiredStates()) {
       assertEquals(DriveConstants.kMaxSpeedMetersPerSecond * 0.5, state.speedMetersPerSecond, 0.01);
@@ -83,7 +85,7 @@ class DriveTests extends DriveSubsystemTestBase {
 
   @Test
   void testDriveDiagonalFieldRelative() {
-    driveSubsystem.drive(1, 1, 0, true, false);
+    runCommand(driveSubsystem.drive(1, 1, 0, true, false));
 
     for (var state : driveSubsystem.getModuleDesiredStates()) {
       assertEquals(DriveConstants.kMaxSpeedMetersPerSecond, state.speedMetersPerSecond, 0.01);
@@ -93,7 +95,7 @@ class DriveTests extends DriveSubsystemTestBase {
 
   @Test
   void testDriveDiagonalBackwardsFieldRelative() {
-    driveSubsystem.drive(-1, -1, 0, true, false);
+    runCommand(driveSubsystem.drive(-1, -1, 0, true, false));
 
     for (var state : driveSubsystem.getModuleDesiredStates()) {
       assertEquals(DriveConstants.kMaxSpeedMetersPerSecond, state.speedMetersPerSecond, 0.01);

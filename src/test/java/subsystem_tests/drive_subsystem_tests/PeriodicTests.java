@@ -17,11 +17,13 @@ import org.junit.jupiter.api.Test;
 
 class PeriodicTests extends DriveSubsystemTestBase {
   @BeforeEach
+  @Override
   public void setUp() {
     super.setUp();
   }
 
   @AfterEach
+  @Override
   public void tearDown() {
     super.tearDown();
   }
@@ -55,11 +57,15 @@ class PeriodicTests extends DriveSubsystemTestBase {
     var states = entry.get();
 
     assertNotNull(states[0]);
+    assertNotNull(states[1]);
+    assertNotNull(states[2]);
+    assertNotNull(states[3]);
     var receivedSpeeds =
         SwerveModuleConstants.kDriveKinematics.toChassisSpeeds(
             new SwerveModuleState[] {states[0], states[1], states[2], states[3]});
 
-    // Until 2025, ChassisSpeeds equals check is not implemented we'll compare each value separately
+    // Until 2025, ChassisSpeeds equals check is not implemented we'll compare each
+    // value separately
     // See: https://github.com/wpilibsuite/allwpilib/pull/6414
     // do this in 2025: {assertEquals(speedsToGo, receivedSpeeds);}
     assertEquals(speedsToGo.vxMetersPerSecond, receivedSpeeds.vxMetersPerSecond, 0.01);

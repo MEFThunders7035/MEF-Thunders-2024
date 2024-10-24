@@ -32,7 +32,7 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     colorSensor = new ColorSensorV3Wrapped(ColorSensorConstants.kColorSensorPort);
 
     new Trigger(this::hasNote)
-        .and(() -> isForced)
+        .and(() -> !isForced)
         .onTrue(this.stop()); // Stop motors on note detection
   }
 
@@ -147,13 +147,12 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   private void setIntakeSpeed(double armSpeed, double groundSpeed, boolean force) {
+    isForced = force;
     if (armSpeed > 0 && hasNote() && !force) { // If we are intaking, check if we have a note.
       armIntake.set(0);
     } else {
       armIntake.set(armSpeed);
     }
-
-    isForced = force;
 
     if (groundSpeed > 0 && hasNote() && !force) { // If we are intaking, check if we have a note.
       groundIntake.set(0);

@@ -7,7 +7,6 @@ import command_tests.utils.CommandTestBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SimHooks;
 import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,9 +37,9 @@ class DefaultDriveCommandTest extends CommandTestBase {
 
   @AfterEach
   public void tearDown() {
-    driveSubsystem.close();
-    resetController();
     super.tearDown();
+    resetController();
+    driveSubsystem.close();
   }
 
   /** Sets all axis to 0 */
@@ -56,9 +55,9 @@ class DefaultDriveCommandTest extends CommandTestBase {
 
     assertTrue(commandScheduler.isScheduled(defaultDriveCommand));
 
-    controllerSim.setLeftY(1);
-    DriverStationSim.notifyNewData();
-    assertEquals(1, controller.getLeftY(), 0.001);
+    controllerSim.setLeftY(-1); // -1 because +y is inverted in the logitech controller
+    controllerSim.notifyNewData();
+    assertEquals(-1, controller.getLeftY(), 0.001, "Signal notify broke, check controllerSim");
     commandScheduler.run();
     SimHooks.stepTiming(2); // ! This is for the rate limiter not to kick in
     commandScheduler.run();
@@ -80,8 +79,8 @@ class DefaultDriveCommandTest extends CommandTestBase {
     assertTrue(commandScheduler.isScheduled(defaultDriveCommand));
 
     controllerSim.setLeftX(1);
-    DriverStationSim.notifyNewData();
-    assertEquals(1, controller.getLeftX(), 0.001);
+    controllerSim.notifyNewData();
+    assertEquals(1, controller.getLeftX(), 0.001, "Signal notify broke, check controllerSim");
     commandScheduler.run();
     SimHooks.stepTiming(2); // ! This is for the rate limiter not to kick in
     commandScheduler.run();
@@ -103,10 +102,10 @@ class DefaultDriveCommandTest extends CommandTestBase {
 
     assertTrue(commandScheduler.isScheduled(defaultDriveCommand));
 
-    controllerSim.setLeftY(1);
+    controllerSim.setLeftY(-1); // -1 because +y is inverted in the logitech controller
     controllerSim.setRightTriggerAxis(1);
-    DriverStationSim.notifyNewData();
-    assertEquals(1, controller.getLeftY(), 0.001);
+    controllerSim.notifyNewData();
+    assertEquals(-1, controller.getLeftY(), 0.001, "Signal notify broke, check controllerSim");
     commandScheduler.run();
     SimHooks.stepTiming(2); // ! This is for the rate limiter not to kick in
     commandScheduler.run();
@@ -126,8 +125,8 @@ class DefaultDriveCommandTest extends CommandTestBase {
 
     controllerSim.setRightX(1);
     controllerSim.setRightTriggerAxis(0);
-    DriverStationSim.notifyNewData();
-    assertEquals(1, controller.getRightX(), 0.001);
+    controllerSim.notifyNewData();
+    assertEquals(1, controller.getRightX(), 0.001, "Signal notify broke, check controllerSim");
     commandScheduler.run();
     SimHooks.stepTiming(2); // ! This is for the rate limiter not to kick in
     commandScheduler.run();

@@ -9,6 +9,17 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class DriveCommands {
+  /**
+   * A command that handles all boost and deadband calculations for the drive command. It also
+   * handles the inversion of the controller, so be careful when using this command.
+   *
+   * <p><b>Warning</b>: This command meant to be used with the <b>Logitech</b> controller only.
+   * Xbox/playstation controllers won't work due to forward and backward being inverted.
+   *
+   * @param driveSubsystem DriveSubsystem
+   * @param controller Logitech controller
+   * @return The command to drive the robot with the <b>Logitech</b> controller
+   */
   public static Command driveWithController(
       DriveSubsystem driveSubsystem, XboxController controller) {
     return driveSubsystem.drive(

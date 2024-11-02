@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakeConstants.ColorSensorConstants;
 import frc.robot.commands.VibrateControllerCommand;
@@ -30,10 +29,6 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
         new CANSparkMAXWrapped(IntakeConstants.kGroundIntakeMotorCanID, MotorType.kBrushless);
     setupIntakeMotors();
     colorSensor = new ColorSensorV3Wrapped(ColorSensorConstants.kColorSensorPort);
-
-    new Trigger(this::hasNote)
-        .and(() -> !isForced)
-        .onTrue(this.stop()); // Stop motors on note detection
   }
 
   @Override
@@ -98,17 +93,25 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
     return this.runOnce(this::stopMotors);
   }
 
+  public Command run(DoubleSupplier armSpeed, DoubleSupplier groundSpeed) {
+
+    return this.runIntakeCommand(armSpeed, groundSpeed, () -> false).until(this::hasNote);
+  }
+
+  public Command run(double armSpeed, double groundSpeed) {
+    return this.run(() -> armSpeed, () -> groundSpeed);
+  }
+
   public Command run(DoubleSupplier speed) {
-    return this.runIntake(speed.getAsDouble(), speed.getAsDouble(), false);
+    return this.run(speed.getAsDouble(), speed.getAsDouble());
   }
 
   public Command run(double speed) {
-    return this.runIntake(speed, speed, false);
+    return this.run(() -> speed);
   }
 
   public Command run() {
-    return this.runIntake(
-        IntakeConstants.kArmIntakeRunSpeed, IntakeConstants.kGroundIntakeRunSpeed, false);
+    return this.run(IntakeConstants.kArmIntakeRunSpeed, IntakeConstants.kGroundIntakeRunSpeed);
   }
 
   /**
@@ -118,21 +121,8 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
    * @return
    */
   public Command loadToShooter() {
-    return this.runIntake(IntakeConstants.kPushToShooterSpeed, 0, true)
-        .deadlineWith(
-            new WaitANDConditionCommand(0.5, () -> !hasNote())); // Stop when we have a note.
-  }
-
-  public Command runIntake(
-      DoubleSupplier armSpeed, DoubleSupplier groundSpeed, BooleanSupplier force) {
-    return this.runEnd(
-        () ->
-            setIntakeSpeed(armSpeed.getAsDouble(), groundSpeed.getAsDouble(), force.getAsBoolean()),
-        this::stopMotors);
-  }
-
-  public Command runIntake(double armSpeed, double groundSpeed, boolean force) {
-    return runIntake(() -> armSpeed, () -> groundSpeed, () -> force);
+    return this.runIntakeCommand(IntakeConstants.kPushToShooterSpeed, 0, true)
+        .raceWith(new WaitANDConditionCommand(0.5, () -> !hasNote())); // Stop when we have a note.
   }
 
   public Command vibrateControllerOnNoteCommand(XboxController controller) {
@@ -144,6 +134,18 @@ public class IntakeSubsystem extends SubsystemBase implements AutoCloseable {
   private void stopMotors() {
     armIntake.stopMotor();
     groundIntake.stopMotor();
+  }
+
+  private Command runIntakeCommand(
+      DoubleSupplier armSpeed, DoubleSupplier groundSpeed, BooleanSupplier force) {
+    return this.runEnd(
+        () ->
+            setIntakeSpeed(armSpeed.getAsDouble(), groundSpeed.getAsDouble(), force.getAsBoolean()),
+        this::stopMotors);
+  }
+
+  private Command runIntakeCommand(double armSpeed, double groundSpeed, boolean force) {
+    return runIntakeCommand(() -> armSpeed, () -> groundSpeed, () -> force);
   }
 
   private void setIntakeSpeed(double armSpeed, double groundSpeed, boolean force) {

@@ -1,19 +1,6 @@
 {
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.server.launchMode": "Standard",
-  "emeraldwalk.runonsave": {
-    "commands":
-    [
-      {
-        "shell": "C:/Program Files/PowerShell/7/pwsh.exe",
-        "match": ".*",
-        "env": {
-          "$JAVA_HOME": "C:/Users/Public/wpilib/2024/jdk"
-        },
-        "cmd": "\"C:/Program Files/PowerShell/7/pwsh.exe\" applyFormatting.ps1"
-      }
-    ]
-  },
   "files.exclude": {
     ".wpilib": true,
     "**/.classpath": true,
